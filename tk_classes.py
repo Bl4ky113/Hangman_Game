@@ -6,13 +6,10 @@ from tkinter import ttk
 bg_color = "#333"
 fg_color = "#e9e9e9"
 
-base_color = "#2601ff"
-dark_color = "#1c00c0"
-
 def tkinter_wrapper (tk_element, pack_options=()):
     wrapper = tk.Frame(
         tk_element,
-        bg=fg_color
+        bg=bg_color
     )
     wrapper.pack(
         expand=pack_options[0],
@@ -70,4 +67,30 @@ class tkinter_text ():
             expand=1,
             fill=pack_options[0],
             side=pack_options[1]
+        )
+
+class tkinter_input ():
+    def btn_input (self, tk_element, onclick, content="", pack_options=""):
+        input_color = f"#{int(bg_color[1:]) + 111}"
+        active_input_color = f"#{int(bg_color[1:]) + 222}"
+
+        btn = tk.Button(
+            tk_element,
+
+            font=("Arial Greek", 14),
+            text=content,
+            command=onclick,
+
+            border=0,
+
+            background=input_color,
+            foreground=fg_color,
+            
+            activebackground=active_input_color,
+            activeforeground=fg_color,
+        )
+        btn.pack(
+            ipadx=5,
+            padx=5,
+            side=pack_options
         )
