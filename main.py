@@ -4,9 +4,16 @@ import tkinter as tk
 from tk_classes import tkinter_text, tkinter_wrapper, tkinter_input
 import os 
 
+# Tkinter items creators.
+text_creator = tkinter_text()
+inputs_creator = tkinter_input() 
 
-def main (): 
+def main ():
+    # Display The Main Page
     base_tk = tk.Tk(className="Hangman The Game")
+
+
+    entry_variable = tk.StringVar()
 
     # Calc the size of the base_tk. 3/4 of the user screen on with and height
     screen_width = base_tk.winfo_screenwidth()
@@ -23,10 +30,6 @@ def main ():
         pady=20
     )
 
-    # Tkinter items creators.
-    text_creator = tkinter_text()
-    inputs_creator = tkinter_input()
- 
     # Header and Bl4ky113
     header_wrapper = tkinter_wrapper(base_tk, (0, "x", "top"))
     text_creator.title(header_wrapper, ("both", "left"), "Hangman")
@@ -37,6 +40,12 @@ def main ():
 
     # Main 
     main_wrapper = tkinter_wrapper(base_tk, (1, "both", "top"))
+    # Word to Guess and Hangman Icon
+    content_wrapper = tkinter_wrapper(main_wrapper, (1, "both", "top"))
+    text_creator.word_to_guess(content_wrapper, ("both", "left"), "H E L L O")
+    # Text Input
+    input_wrapper = tkinter_wrapper(base_tk, (1, "x", "top"))
+    inputs_creator.txt_input(input_wrapper, entry_variable, ("both", "top", "center"))
 
     # Footer
     footer_wrapper = tkinter_wrapper(base_tk, (0, "x", "bottom"))
