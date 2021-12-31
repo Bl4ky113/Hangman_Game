@@ -9,7 +9,7 @@ text_creator = tkinter_text()
 inputs_creator = tkinter_input() 
 
 def main ():
-    word_to_guess = "hello"
+    word_to_guess = "12345678901234567890"
 
     # Display The Main Page
     base_tk = tk.Tk(className="Hangman The Game")
@@ -42,12 +42,23 @@ def main ():
 
     # Main 
     main_wrapper = tkinter_wrapper(base_tk, (1, "both", "top"))
+    
     # Word to Guess and Hangman Icon
     content_wrapper = tkinter_wrapper(main_wrapper, (1, "both", "top"))
+
     # Word To Guess
+    wrap_len = int(base_width * 0.6) # Calc the wrap size of the letters in the wrapper.
+
+    font_size = 40 # Calc the size of the font in the word to guess
+    if len(word_to_guess) > 10:
+        font_size = 30
+    elif len(word_to_guess) > 15:
+        font_size = 25
+    elif len(word_to_guess) > 20:
+        font_size = 20
+
     word_wrapper = tkinter_wrapper(content_wrapper, (1, "both", "left"))
-    for letter in word_to_guess:
-        text_creator.word_to_guess(word_wrapper, ("x", "left"), letter)
+    text_creator.word_to_guess(word_wrapper, ("x", "left"), word_to_guess, font_size, wrap_len)
 
     # Hangman Icon
     # Calc the size of the hangman canvas. 35% width and 50% height of the base_tk
@@ -55,11 +66,6 @@ def main ():
     canvas_height = int(base_height * 0.5)
 
     hangman = tkinter_canvas(content_wrapper, canvas_width, canvas_height, "right")
-    hangman.drawBase()
-    hangman.drawHead()
-    hangman.drawBody()
-    hangman.drawLegs()
-    hangman.drawRope()
 
     # Text Input
     input_wrapper = tkinter_wrapper(base_tk, (1, "x", "top"))

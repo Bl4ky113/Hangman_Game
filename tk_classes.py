@@ -2,13 +2,14 @@
 
 import tkinter as tk
 from tkinter import ttk
+from tkinter.constants import ANCHOR
 from typing import ForwardRef
 
 bg_color = "#333333"
 fg_color = "#e9e9e9"
 
 def tkinter_wrapper (tk_element, pack_options=()):
-    """ Creates a wrapper and return the wrapper item """
+    """ Creates a Frame wrapper and return the wrapper item """
     wrapper = tk.Frame(
         tk_element,
         bg=bg_color
@@ -58,17 +59,19 @@ class tkinter_text ():
             side=pack_options[1],
         )
 
-    def word_to_guess (self, tk_element, pack_options=(), content=""):
-        """ Creates a styled text for the letters or word (not certain) of the word to guess. """        
+    def word_to_guess (self, tk_element, pack_options=(), content="", font_size=20, wrap_len=0):
+        """ Creates a styled text for the letters or word (not certain) of the word to guess. """
         word_bg_color = f"#{hex(int(bg_color[1:], 16) + int('151515', 16))[2:]}"
         
         text_element = ttk.Label(
             tk_element,
-            padding=(20, 10),
-            font=("Arial Black", 18, "underline"),
+            padding=(5, 10),
+            font=("Arial Black", font_size, "underline"),
             foreground=fg_color,
             background=word_bg_color,
             text=content,
+            wraplength=wrap_len,
+            justify="center",
             anchor="center"
         )
         text_element.pack(
@@ -144,7 +147,7 @@ class tkinter_input ():
         )
 
 class tkinter_canvas ():
-    """ Tkinter hangman-canvas class, contains the creator of the canvas and draw the progress of the "hang" """
+    """ Tkinter hangman-canvas class, contains the creator of the canvas and draw the initial progress of the "hang" """
     def __init__ (self, tk_element, width, height, pack_option):
         """ Creates the Canvas """
         canvas_bg_color = f"#{int(bg_color[1:]) - 111111}"
@@ -164,6 +167,8 @@ class tkinter_canvas ():
             padx=10,
             pady=10
         )
+
+        self.drawBase()
 
     def drawBase (self):
         """ Draws something to hang the man. The begining of the "hang" process (0/4) """
