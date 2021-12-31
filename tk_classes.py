@@ -146,26 +146,28 @@ class tkinter_input ():
 class tkinter_canvas ():
     """ Tkinter hangman-canvas class, contains the creator of the canvas and draw the progress of the "hang" """
     def __init__ (self, tk_element, width, height, pack_option):
-        """ Creates the Canvas and draws something to hang the man. The begining of the "hang" process """
+        """ Creates the Canvas """
         canvas_bg_color = f"#{int(bg_color[1:]) - 111111}"
         self.canvas_item_ids = []
         self.cw = width
         self.ch = height
 
-        canvas = tk.Canvas(
+        self.canvas = tk.Canvas(
             tk_element,
             background=canvas_bg_color,
             border=0,
             width=self.cw,
             height=self.ch
         )
-        canvas.pack(
+        self.canvas.pack(
             side=pack_option,
             padx=10,
             pady=10
         )
 
-        canvas.create_polygon(
+    def drawBase (self):
+        """ Draws something to hang the man. The begining of the "hang" process (0/) """
+        self.canvas.create_polygon(
             (self.cw * 0.15), (self.ch * 0.8), 
             (self.cw * 0.15), (self.ch * 0.7), 
             (self.cw * 0.2), (self.ch * 0.7), 
@@ -181,4 +183,35 @@ class tkinter_canvas ():
             (self.cw * 0.15), (self.ch * 0.8),
             fill=fg_color,
             width=4
+        )
+
+    def drawHead (self):
+        """ Draws the head of the man. (1/) """
+        self.canvas.create_oval(
+            (self.cw * 0.5), (self.ch * 0.3),
+            (self.cw * 0.66), (self.ch * 0.46),
+            fill=fg_color
+        )
+
+    def drawBody (self):
+        """ Draws the Body and Arms of the man. (2/) """
+        self.canvas.create_rectangle(
+            (self.cw * 0.54), (self.ch * 0.4),
+            (self.cw * 0.6), (self.ch * 0.6),
+            fill=fg_color,
+            outline=fg_color
+        )
+
+        self.canvas.create_line(
+            (self.cw * 0.54), (self.ch * 0.4),
+            (self.cw * 0.70), (self.ch * 0.56),
+            fill=fg_color,
+            width=10
+        )
+
+        self.canvas.create_line(
+            (self.cw * 0.6), (self.ch * 0.4),
+            (self.cw * 0.44), (self.ch * 0.56),
+            fill=fg_color,
+            width=10   
         )

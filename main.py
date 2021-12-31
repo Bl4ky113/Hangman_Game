@@ -48,13 +48,16 @@ def main ():
     word_wrapper = tkinter_wrapper(content_wrapper, (1, "both", "left"))
     for letter in word_to_guess:
         text_creator.word_to_guess(word_wrapper, ("x", "left"), letter)
-    # Hangman Icon
 
+    # Hangman Icon
     # Calc the size of the hangman canvas. 35% width and 50% height of the base_tk
     canvas_width = int(base_width * 0.35)
     canvas_height = int(base_height * 0.5)
 
     hangman = tkinter_canvas(content_wrapper, canvas_width, canvas_height, "right")
+    hangman.drawBase()
+    hangman.drawHead()
+    hangman.drawBody()
 
     # Text Input
     input_wrapper = tkinter_wrapper(base_tk, (1, "x", "top"))
