@@ -166,14 +166,14 @@ class tkinter_canvas ():
         )
 
     def drawBase (self):
-        """ Draws something to hang the man. The begining of the "hang" process (0/) """
+        """ Draws something to hang the man. The begining of the "hang" process (0/4) """
         self.canvas.create_polygon(
             (self.cw * 0.15), (self.ch * 0.8), 
             (self.cw * 0.15), (self.ch * 0.7), 
             (self.cw * 0.2), (self.ch * 0.7), 
             (self.cw * 0.2), (self.ch * 0.15),
-            (self.cw * 0.6), (self.ch * 0.15),
-            (self.cw * 0.6), (self.ch * 0.25),
+            (self.cw * 0.58), (self.ch * 0.15),
+            (self.cw * 0.58), (self.ch * 0.25),
             (self.cw * 0.56), (self.ch * 0.25),
             (self.cw * 0.56), (self.ch * 0.2),
             (self.cw * 0.24), (self.ch * 0.2),
@@ -186,7 +186,7 @@ class tkinter_canvas ():
         )
 
     def drawHead (self):
-        """ Draws the head of the man. (1/) """
+        """ Draws the head of the man. (1/4) """
         self.canvas.create_oval(
             (self.cw * 0.5), (self.ch * 0.3),
             (self.cw * 0.66), (self.ch * 0.46),
@@ -194,7 +194,7 @@ class tkinter_canvas ():
         )
 
     def drawBody (self):
-        """ Draws the Body and Arms of the man. (2/) """
+        """ Draws the Body and Arms of the man. (2/4) """
         self.canvas.create_rectangle(
             (self.cw * 0.54), (self.ch * 0.4),
             (self.cw * 0.6), (self.ch * 0.6),
@@ -206,12 +206,54 @@ class tkinter_canvas ():
             (self.cw * 0.54), (self.ch * 0.4),
             (self.cw * 0.70), (self.ch * 0.56),
             fill=fg_color,
-            width=10
+            width=12
         )
 
         self.canvas.create_line(
             (self.cw * 0.6), (self.ch * 0.4),
             (self.cw * 0.44), (self.ch * 0.56),
             fill=fg_color,
-            width=10   
+            width=12   
+        )
+
+    def drawLegs (self):
+        """ Draws the legs of the man. (3/4) """
+        self.canvas.create_line(
+            (self.cw * 0.56), (self.ch * 0.58),
+            (self.cw * 0.44), (self.ch * 0.7),
+            fill=fg_color,
+            width=15
+        )
+
+        self.canvas.create_line(
+            (self.cw * 0.58), (self.ch * 0.58),
+            (self.cw * 0.7), (self.ch * 0.7),
+            fill=fg_color,
+            width=15
+        )
+
+    def drawRope(self):
+        """ Draws the rope around the man's neck and hangs him also writes on screen "hanged". (4/4) """
+        rope_color = f"#{hex(int(bg_color[1:], 16) + int('555555', 16))[2:]}"
+
+        self.canvas.create_polygon(
+            (self.cw * 0.52), (self.ch * 0.44),
+            (self.cw * 0.56), (self.ch * 0.44),
+            (self.cw * 0.56), (self.ch * 0.23),
+            (self.cw * 0.58), (self.ch * 0.23),
+            (self.cw * 0.58), (self.ch * 0.44),
+            (self.cw * 0.62), (self.ch * 0.44),
+            (self.cw * 0.6), (self.ch * 0.46),
+            (self.cw * 0.54), (self.ch * 0.46),
+            (self.cw * 0.52), (self.ch * 0.44),
+            fill=rope_color
+        )
+
+        self.canvas.create_text(
+            (self.cw * 0.55), (self.ch * 0.9),
+            font=("Arial Black", 20),
+            justify="center",
+            anchor="center",
+            text="Hanged...",
+            fill=rope_color
         )

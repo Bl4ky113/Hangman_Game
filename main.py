@@ -58,6 +58,8 @@ def main ():
     hangman.drawBase()
     hangman.drawHead()
     hangman.drawBody()
+    hangman.drawLegs()
+    hangman.drawRope()
 
     # Text Input
     input_wrapper = tkinter_wrapper(base_tk, (1, "x", "top"))
