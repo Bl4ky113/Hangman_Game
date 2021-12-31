@@ -1,15 +1,60 @@
 # Made By Bl4ky113
 
 import tkinter as tk
+import json
+from random import randrange
 from tk_classes import tkinter_canvas, tkinter_text, tkinter_wrapper, tkinter_input
-import os 
 
 # Tkinter items creators.
 text_creator = tkinter_text()
 inputs_creator = tkinter_input() 
 
+def getWordList (list_name="simple_words", language="en"):
+    """ Gets the list of words in a json file """
+    list_url = f"./files/{language}/{list_name}.json"
+    words_arr = []
+
+    with open(list_url, "r", encoding="UTF-8") as list_file:
+        list_dict = json.load(list_file)
+        
+        for word in list_dict["words"]:
+            words_arr.append(word.lower())
+
+    return words_arr
+
+def chooseWordToGuess (word_list=[], already_passed_words=[]):
+    """ Choose in the word list a word, ignoring the ones who already passed """
+    posible_words_to_chose = []
+
+    for word in word_list:
+        if word not in already_passed_words:
+            posible_words_to_chose.append(word)
+
+    word_chosen = posible_words_to_chose[randrange(len(posible_words_to_chose) - 1)]
+    already_passed_words.append(word_chosen)
+
+    return word_chosen
+
+def transformWordToOutput (word="", visible_chars=[]):
+    """ Transform the word to gues in to a output, hidding the characters the player hasn't enter """
+    transformed_word = ""
+
+    for letter in word:
+        if letter not in visible_chars and not letter.isspace():
+            transformed_word += "* "
+        else:
+            transformed_word += letter + " "
+
+    return transformed_word.strip()
+
 def main ():
-    word_to_guess = "12345678901234567890"
+    """ Main Function """
+
+    # Get the Initial Word List
+    word_list = getWordList()
+    passed_words = []
+    word_to_guess = chooseWordToGuess(word_list, passed_words)
+    word_output = transformWordToOutput(word_to_guess)
 
     # Display The Main Page
     base_tk = tk.Tk(className="Hangman The Game")
@@ -58,7 +103,7 @@ def main ():
         font_size = 20
 
     word_wrapper = tkinter_wrapper(content_wrapper, (1, "both", "left"))
-    text_creator.word_to_guess(word_wrapper, ("x", "left"), word_to_guess, font_size, wrap_len)
+    text_creator.word_to_guess(word_wrapper, ("x", "left"), word_output, font_size, wrap_len)
 
     # Hangman Icon
     # Calc the size of the hangman canvas. 35% width and 50% height of the base_tk
