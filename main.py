@@ -1,7 +1,7 @@
 # Made By Bl4ky113
 
 import tkinter as tk
-from tk_classes import tkinter_text, tkinter_wrapper, tkinter_input
+from tk_classes import tkinter_canvas, tkinter_text, tkinter_wrapper, tkinter_input
 import os 
 
 # Tkinter items creators.
@@ -9,15 +9,17 @@ text_creator = tkinter_text()
 inputs_creator = tkinter_input() 
 
 def main ():
+    word_to_guess = "hello"
+
     # Display The Main Page
     base_tk = tk.Tk(className="Hangman The Game")
 
-
     entry_variable = tk.StringVar()
 
-    # Calc the size of the base_tk. 3/4 of the user screen on with and height
     screen_width = base_tk.winfo_screenwidth()
     screen_height = base_tk.winfo_screenheight()
+
+    # Calc the size of the base_tk. 3/4 of the user screen on with and height
     base_width = int(screen_width * 0.75)
     base_height = int(screen_height * 0.75)
     base_x_align = int((screen_width - base_width) / 2)
@@ -42,7 +44,18 @@ def main ():
     main_wrapper = tkinter_wrapper(base_tk, (1, "both", "top"))
     # Word to Guess and Hangman Icon
     content_wrapper = tkinter_wrapper(main_wrapper, (1, "both", "top"))
-    text_creator.word_to_guess(content_wrapper, ("both", "left"), "H E L L O")
+    # Word To Guess
+    word_wrapper = tkinter_wrapper(content_wrapper, (1, "both", "left"))
+    for letter in word_to_guess:
+        text_creator.word_to_guess(word_wrapper, ("x", "left"), letter)
+    # Hangman Icon
+
+    # Calc the size of the hangman canvas. 35% width and 50% height of the base_tk
+    canvas_width = int(base_width * 0.35)
+    canvas_height = int(base_height * 0.5)
+
+    hangman = tkinter_canvas(content_wrapper, canvas_width, canvas_height, "right")
+
     # Text Input
     input_wrapper = tkinter_wrapper(base_tk, (1, "x", "top"))
     inputs_creator.txt_input(input_wrapper, entry_variable, ("both", "top", "center"))

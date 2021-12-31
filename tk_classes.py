@@ -2,11 +2,13 @@
 
 import tkinter as tk
 from tkinter import ttk
+from typing import ForwardRef
 
 bg_color = "#333333"
 fg_color = "#e9e9e9"
 
 def tkinter_wrapper (tk_element, pack_options=()):
+    """ Creates a wrapper and return the wrapper item """
     wrapper = tk.Frame(
         tk_element,
         bg=bg_color
@@ -20,7 +22,9 @@ def tkinter_wrapper (tk_element, pack_options=()):
     return wrapper
 
 class tkinter_text ():
+    """ Styled tkinter text creator """
     def title (self, tk_element, pack_options=(), content=""):
+        """ Creates a title styled text """
         title_bg_color = f"#{int(bg_color[1:]) + 111111}"
 
         title_element = ttk.Label(
@@ -39,6 +43,7 @@ class tkinter_text ():
         )
 
     def text (self, tk_element, pack_options=(), content=""):
+        """ Creates a Simple styled text """
         text_element = ttk.Label(
             tk_element,
             padding=(20, 5),
@@ -54,6 +59,7 @@ class tkinter_text ():
         )
 
     def word_to_guess (self, tk_element, pack_options=(), content=""):
+        """ Creates a styled text for the letters or word (not certain) of the word to guess. """        
         word_bg_color = f"#{hex(int(bg_color[1:], 16) + int('151515', 16))[2:]}"
         
         text_element = ttk.Label(
@@ -72,6 +78,7 @@ class tkinter_text ():
         )
 
     def bl4ky (self, tk_element, pack_options=()):
+        """ Creates a styled text with my personal-"artist" signature """
         text_element = ttk.Label(
             tk_element,
             padding=(10, 5),
@@ -88,7 +95,9 @@ class tkinter_text ():
         )
 
 class tkinter_input ():
+    """ Styled tkinter input creator """
     def btn_input (self, tk_element, onclick, content="", pack_options=""):
+        """ Creates a Styled tkinter btn """
         input_color = f"#{int(bg_color[1:]) + 111111}"
         active_input_color = f"#{int(bg_color[1:]) + 222222}"
 
@@ -110,8 +119,8 @@ class tkinter_input ():
         )
 
     def txt_input (self, tk_element, output_variable, pack_options=()):
+        """ Creates a Styled Tkinter text input """
         input_color = f"#{int(bg_color[1:]) - 111111}"
-        active_input_color = f"#{int(bg_color[1:]) - 111111}"
 
         text_input = tk.Entry(
             tk_element,
@@ -121,7 +130,6 @@ class tkinter_input ():
             font=("Arial Black", 20),
             foreground=fg_color,
             background=input_color,
-            highlightbackground=active_input_color,
             insertbackground=fg_color,
             insertwidth=5,
         )
@@ -133,4 +141,44 @@ class tkinter_input ():
             expand=1,
             side=pack_options[1],
             anchor=pack_options[2]
+        )
+
+class tkinter_canvas ():
+    """ Tkinter hangman-canvas class, contains the creator of the canvas and draw the progress of the "hang" """
+    def __init__ (self, tk_element, width, height, pack_option):
+        """ Creates the Canvas and draws something to hang the man. The begining of the "hang" process """
+        canvas_bg_color = f"#{int(bg_color[1:]) - 111111}"
+        self.canvas_item_ids = []
+        self.cw = width
+        self.ch = height
+
+        canvas = tk.Canvas(
+            tk_element,
+            background=canvas_bg_color,
+            border=0,
+            width=self.cw,
+            height=self.ch
+        )
+        canvas.pack(
+            side=pack_option,
+            padx=10,
+            pady=10
+        )
+
+        canvas.create_polygon(
+            (self.cw * 0.15), (self.ch * 0.8), 
+            (self.cw * 0.15), (self.ch * 0.7), 
+            (self.cw * 0.2), (self.ch * 0.7), 
+            (self.cw * 0.2), (self.ch * 0.15),
+            (self.cw * 0.6), (self.ch * 0.15),
+            (self.cw * 0.6), (self.ch * 0.25),
+            (self.cw * 0.56), (self.ch * 0.25),
+            (self.cw * 0.56), (self.ch * 0.2),
+            (self.cw * 0.24), (self.ch * 0.2),
+            (self.cw * 0.24), (self.ch * 0.7),
+            (self.cw * 0.29), (self.ch * 0.7),
+            (self.cw * 0.29), (self.ch * 0.8),
+            (self.cw * 0.15), (self.ch * 0.8),
+            fill=fg_color,
+            width=4
         )
