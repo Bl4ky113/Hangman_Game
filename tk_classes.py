@@ -274,3 +274,20 @@ class tkinter_canvas ():
             fill=rope_color,
             tags="step_4"
         )
+
+class tkinter_popup ():
+    def pop (self, funct, title="", content=""):
+        # Tkinter Elements contructors
+        text_creator = tkinter_text()
+        inputs_creator = tkinter_input()
+
+        self.popup = tk.Toplevel(
+            background=bg_color,
+            padx=30,
+            pady=50
+        )
+        self.popup.wm_title(title)
+
+        title_label = text_creator.title(self.popup, ("x", "top"), title)
+        text_label = text_creator.text(self.popup, ("both", "top"), content)
+        popup_btn = inputs_creator.btn_input(self.popup, funct, "Next", "top")
