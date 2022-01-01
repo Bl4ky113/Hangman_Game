@@ -171,9 +171,9 @@ class tkinter_canvas ():
             pady=10
         )
 
-        self.drawBase()
+        self.drawStep0()
 
-    def drawBase (self):
+    def drawStep0 (self):
         """ Draws something to hang the man. The begining of the "hang" process (0/4) """
         self.canvas.create_polygon(
             (self.cw * 0.15), (self.ch * 0.8), 
@@ -194,7 +194,7 @@ class tkinter_canvas ():
             tags="step_0"
         )
 
-    def drawHead (self):
+    def drawStep1 (self):
         """ Draws the head of the man. (1/4) """
         self.canvas.create_oval(
             (self.cw * 0.5), (self.ch * 0.3),
@@ -203,7 +203,7 @@ class tkinter_canvas ():
             tags="step_1"
         )
 
-    def drawBody (self):
+    def drawStep2 (self):
         """ Draws the Body and Arms of the man. (2/4) """
         self.canvas.create_rectangle(
             (self.cw * 0.54), (self.ch * 0.4),
@@ -229,7 +229,7 @@ class tkinter_canvas ():
             tags="step_2"
         )
 
-    def drawLegs (self):
+    def drawStep3 (self):
         """ Draws the legs of the man. (3/4) """
         self.canvas.create_line(
             (self.cw * 0.56), (self.ch * 0.58),
@@ -247,7 +247,7 @@ class tkinter_canvas ():
             tags="step_3"
         )
 
-    def drawRope(self):
+    def drawStep4 (self):
         """ Draws the rope around the man's neck and hangs him also writes on screen "hanged". (4/4) """
         rope_color = f"#{hex(int(bg_color[1:], 16) + int('555555', 16))[2:]}"
 

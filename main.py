@@ -16,20 +16,20 @@ game_status = True
 
 def nextRound (popup):
     """ Swaps to the next round, changing the word to guess and restarting the round. Gets called from a Popup """
-    global game_status, guessed_letters, word_to_guess
+    global game_status, word_data
 
     popup.destroy()
 
-    if passed_words == word_list:
+    if len(word_data["passed"]) == len(word_data["list"]):
         print("End Of The Game")
     else:
-        guessed_letters = []
-        word_to_guess = chooseWordToGuess(word_list, passed_words)
-        word_output = transformWordToOutput(word_to_guess, guessed_letters)
+        word_data["guessed_letters"] = []
+        word_data["to_guess"] = chooseWordToGuess(word_data["list"], word_data["passed"])
+        word_data["word_output"] = transformWordToOutput(word_data["to_guess"], word_data["guessed_letters"])
 
         hangProcess(step="all", delete_step=True)
         hangman.current_step = 0
-        word_label.configure(text=word_output)
+        word_label.configure(text=word_data["word_output"])
         game_status = True
 
 
@@ -77,7 +77,7 @@ def transformWordToOutput (word="", visible_chars=[]):
 
 def checkInput (input_word):
     """ 
-        Checks if the Entry Variable or the Text input last entry is in word_to_guess. 
+        Checks if the Entry Variable or the Text input last entry is in word_data["to_guess"]. 
         If its right shows the letter in the outputWord, if the output word and word to guess are the same. Win the round.
         If it isn't right moves 1 step the hangman progress. If the hangman gets hang, lose the round.
     """
@@ -86,19 +86,19 @@ def checkInput (input_word):
     if len(input_word.get()) > 0 and game_status:
         input_letter = input_word.get()[-1]
 
-        if input_letter.lower() in word_to_guess:
-            guessed_letters.append(input_letter.lower())
-            word_output = transformWordToOutput(word_to_guess, guessed_letters)
-            word_label.configure(text=word_output)
+        if input_letter.lower() in word_data["to_guess"]:
+            word_data["guessed_letters"].append(input_letter.lower())
+            word_data["word_output"] = transformWordToOutput(word_data["to_guess"], word_data["guessed_letters"])
+            word_label.configure(text=word_data["word_output"])
 
-            if word_output == word_to_guess:
+            if word_data["word_output"] == word_data["to_guess"]:
                 game_status = False
                 popup_creator.pop(lambda: nextRound(popup_creator.popup), "You Win This Round", "You have won this round. Congrats, you have saved him!!!")
         else:
             hangman.current_step += 1
-            if hangman.current_step < 4:
-                hangProcess(hangman.current_step)
-            else:
+            hangProcess(hangman.current_step)
+
+            if hangman.current_step >= 4:
                 game_status = False
                 popup_creator.pop(lambda: nextRound(popup_creator.popup), "You Lose This Round", "You have lost this round. You have killed him, monster.")
 
@@ -109,34 +109,27 @@ def checkInput (input_word):
 
 def hangProcess (step=0, delete_step=False):
     """ Controls the progress of the hang process. Can Draw or delete each step """
-    if step == 0:
-        hangman.drawBase()
-    elif step == 1:
-        hangman.drawHead()
-    elif step == 2:
-        hangman.drawBody()
-    elif step == 3:
-        hangman.drawLegs()
-    elif step == 4:
-        hangman.drawRope()
-
     if delete_step:
         if step == "all":
             hangman.canvas.delete("all")
-            hangman.drawBase()
+            hangman.drawStep0()
         else:
             hangman.canvas.delete(f"step_{step}")
+    else:
+        getattr(hangman, f"drawStep{step}")()
 
 def main ():
     """ Main Function """
 
-    # Get the Initial Word List
-    global word_list, passed_words, guessed_letters, word_to_guess, hangman, word_label
-    word_list = getWordList()
-    passed_words = []
-    word_to_guess = chooseWordToGuess(word_list, passed_words)
-    guessed_letters = []
-    word_output = transformWordToOutput(word_to_guess, guessed_letters)
+    # Get the Initial Word data 
+    global word_data, hangman, word_label
+    word_data = {
+        "list": getWordList(),
+        "passed": [],
+        "guessed_letters": []
+    }
+    word_data["to_guess"] = chooseWordToGuess(word_data["list"], word_data["passed"])
+    word_data["output"] = transformWordToOutput(word_data["to_guess"], word_data["guessed_letters"])
 
     # Display The Main Base
     base_tk = tk.Tk(className="Hangman The Game")
@@ -175,15 +168,15 @@ def main ():
     wrap_len = int(base_width * 0.6) # Calc the wrap size of the letters in the wrapper.
 
     font_size = 40 # Calc the size of the font in the word to guess
-    if len(word_to_guess) > 10:
+    if len(word_data["to_guess"]) > 10:
         font_size = 30
-    elif len(word_to_guess) > 15:
+    elif len(word_data["to_guess"]) > 15:
         font_size = 25
-    elif len(word_to_guess) > 20:
+    elif len(word_data["to_guess"]) > 20:
         font_size = 20
 
     word_wrapper = tkinter_wrapper(content_wrapper, (1, "both", "left"))
-    word_label = text_creator.word_to_guess(word_wrapper, ("x", "left"), word_output, font_size, wrap_len)
+    word_label = text_creator.word_to_guess(word_wrapper, ("x", "left"), word_data["output"], font_size, wrap_len)
 
     # Hangman Icon
     # Calc the size of the hangman canvas. 35% width and 50% height of the base_tk
