@@ -1,5 +1,6 @@
 # Made By Bl4ky113
 
+from math import isnan
 import tkinter as tk
 import json
 from random import randrange
@@ -7,7 +8,7 @@ from tk_classes import tkinter_canvas, tkinter_text, tkinter_wrapper, tkinter_in
 
 # Tkinter items creators.
 text_creator = tkinter_text()
-inputs_creator = tkinter_input() 
+inputs_creator = tkinter_input()
 
 def getWordList (list_name="simple_words", language="en"):
     """ Gets the list of words in a json file """
@@ -41,11 +42,48 @@ def transformWordToOutput (word="", visible_chars=[]):
 
     for letter in word:
         if letter not in visible_chars and not letter.isspace():
-            transformed_word += "* "
+            transformed_word += " * "
         else:
-            transformed_word += letter + " "
+            transformed_word += letter
 
     return transformed_word.strip()
+
+def checkInput (input_word, word_to_guess, guessed_letters):
+    """ Checks if the Entry Variable or the Text input last entry is in word_to_guess """
+    if len(input_word.get()) > 0:
+        input_letter = input_word.get()[-1]
+
+        if input_letter.lower() in word_to_guess:
+            guessed_letters.append(input_letter.lower())
+            word_output = transformWordToOutput(word_to_guess, guessed_letters)
+            word_label.configure(text=word_output)
+
+            if word_output == word_to_guess:
+                print("Win")
+        else:
+            if hangman.current_step <= 3:
+                hangman.current_step += 1
+                hangProcess(hangman.current_step)
+            else:
+                print("Game Over")
+
+        input_word.set(input_letter)
+
+def hangProcess (step=0, delete_step=False):
+    """ Controls the progress of the hang process. Can Draw or delete each step """
+    if step == 0:
+        hangman.drawBase()
+    elif step == 1:
+        hangman.drawHead()
+    elif step == 2:
+        hangman.drawBody()
+    elif step == 3:
+        hangman.drawLegs()
+    elif step == 4:
+        hangman.drawRope()
+
+    if delete_step:
+        hangman.canvas.delete(f"step_{step}") 
 
 def main ():
     """ Main Function """
@@ -54,12 +92,12 @@ def main ():
     word_list = getWordList()
     passed_words = []
     word_to_guess = chooseWordToGuess(word_list, passed_words)
-    word_output = transformWordToOutput(word_to_guess)
+    print(word_to_guess)
+    guessed_letters = []
+    word_output = transformWordToOutput(word_to_guess, guessed_letters)
 
     # Display The Main Page
     base_tk = tk.Tk(className="Hangman The Game")
-
-    entry_variable = tk.StringVar()
 
     screen_width = base_tk.winfo_screenwidth()
     screen_height = base_tk.winfo_screenheight()
@@ -89,6 +127,7 @@ def main ():
     main_wrapper = tkinter_wrapper(base_tk, (1, "both", "top"))
     
     # Word to Guess and Hangman Icon
+    global hangman, word_label
     content_wrapper = tkinter_wrapper(main_wrapper, (1, "both", "top"))
 
     # Word To Guess
@@ -103,7 +142,7 @@ def main ():
         font_size = 20
 
     word_wrapper = tkinter_wrapper(content_wrapper, (1, "both", "left"))
-    text_creator.word_to_guess(word_wrapper, ("x", "left"), word_output, font_size, wrap_len)
+    word_label = text_creator.word_to_guess(word_wrapper, ("x", "left"), word_output, font_size, wrap_len)
 
     # Hangman Icon
     # Calc the size of the hangman canvas. 35% width and 50% height of the base_tk
@@ -113,6 +152,9 @@ def main ():
     hangman = tkinter_canvas(content_wrapper, canvas_width, canvas_height, "right")
 
     # Text Input
+    entry_variable = tk.StringVar()
+    entry_variable.trace_add("write", lambda x, y, z: checkInput(entry_variable, word_to_guess, guessed_letters))
+
     input_wrapper = tkinter_wrapper(base_tk, (1, "x", "top"))
     inputs_creator.txt_input(input_wrapper, entry_variable, ("both", "top", "center"))
 

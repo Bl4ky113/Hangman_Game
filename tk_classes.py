@@ -80,6 +80,8 @@ class tkinter_text ():
             side=pack_options[1]
         )
 
+        return text_element
+
     def bl4ky (self, tk_element, pack_options=()):
         """ Creates a styled text with my personal-"artist" signature """
         text_element = ttk.Label(
@@ -152,6 +154,7 @@ class tkinter_canvas ():
         """ Creates the Canvas """
         canvas_bg_color = f"#{int(bg_color[1:]) - 111111}"
         self.canvas_item_ids = []
+        self.current_step = 0
         self.cw = width
         self.ch = height
 
@@ -187,7 +190,8 @@ class tkinter_canvas ():
             (self.cw * 0.29), (self.ch * 0.8),
             (self.cw * 0.15), (self.ch * 0.8),
             fill=fg_color,
-            width=4
+            width=4,
+            tags="step_0"
         )
 
     def drawHead (self):
@@ -195,7 +199,8 @@ class tkinter_canvas ():
         self.canvas.create_oval(
             (self.cw * 0.5), (self.ch * 0.3),
             (self.cw * 0.66), (self.ch * 0.46),
-            fill=fg_color
+            fill=fg_color,
+            tags="step_1"
         )
 
     def drawBody (self):
@@ -204,21 +209,24 @@ class tkinter_canvas ():
             (self.cw * 0.54), (self.ch * 0.4),
             (self.cw * 0.6), (self.ch * 0.6),
             fill=fg_color,
-            outline=fg_color
+            outline=fg_color,
+            tags="step_2"
         )
 
         self.canvas.create_line(
             (self.cw * 0.54), (self.ch * 0.4),
             (self.cw * 0.70), (self.ch * 0.56),
             fill=fg_color,
-            width=12
+            width=12,
+            tags="step_2"
         )
 
         self.canvas.create_line(
             (self.cw * 0.6), (self.ch * 0.4),
             (self.cw * 0.44), (self.ch * 0.56),
             fill=fg_color,
-            width=12   
+            width=12,
+            tags="step_2"
         )
 
     def drawLegs (self):
@@ -227,14 +235,16 @@ class tkinter_canvas ():
             (self.cw * 0.56), (self.ch * 0.58),
             (self.cw * 0.44), (self.ch * 0.7),
             fill=fg_color,
-            width=15
+            width=15,
+            tags="step_3"
         )
 
         self.canvas.create_line(
             (self.cw * 0.58), (self.ch * 0.58),
             (self.cw * 0.7), (self.ch * 0.7),
             fill=fg_color,
-            width=15
+            width=15,
+            tags="step_3"
         )
 
     def drawRope(self):
@@ -251,7 +261,8 @@ class tkinter_canvas ():
             (self.cw * 0.6), (self.ch * 0.46),
             (self.cw * 0.54), (self.ch * 0.46),
             (self.cw * 0.52), (self.ch * 0.44),
-            fill=rope_color
+            fill=rope_color,
+            tags="step_4"
         )
 
         self.canvas.create_text(
@@ -260,5 +271,6 @@ class tkinter_canvas ():
             justify="center",
             anchor="center",
             text="Hanged...",
-            fill=rope_color
+            fill=rope_color,
+            tags="step_4"
         )
