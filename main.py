@@ -85,18 +85,24 @@ def changeWordListMenu (popup_caller=any):
     footer_wrapper = tkinter_wrapper(popup_base, (0, "x", "bottom"))
     inputs_creator.btn_input(
         footer_wrapper, 
-        lambda: changeWordList(boxlist.get(boxlist.curselection()[0]), popup_base),
+        lambda: changeWordList(boxlist, popup_base),
         "Change To the new List", 
         "right"
     )
+
     # inputs_creator.btn_input(footer_wrapper, lambda: print("change"), "Open Word List", "right")
 
-def changeWordList (selected_file, popup):
+def changeWordList (boxlist, popup):
     """ Updates the global word list and passed words with the chosen word list and empty or new arr. 
     Restarts the score and then starts a new round 
     """
-    file_language = selected_file[:2]
-    file_name = selected_file[3:]
+    try:
+        selected_file = boxlist.get(boxlist.curselection()[0])
+        file_language = selected_file[:2]
+        file_name = selected_file[3:]
+    except:
+        popup_creator.pop(lambda: popup_creator.popup.destroy(), "Error On Loading Word List", "Please Enter a Valid Word List")
+        return
 
     global word_data, game_data
     word_data["list"] = getWordList(file_name, file_language)
