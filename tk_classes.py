@@ -2,8 +2,6 @@
 
 import tkinter as tk
 from tkinter import ttk
-from tkinter.constants import ANCHOR
-from typing import ForwardRef
 
 bg_color = "#333333"
 fg_color = "#e9e9e9"
@@ -144,9 +142,33 @@ class tkinter_input ():
             padx=5,
             pady=5,
             expand=1,
-            side=pack_options[1],
-            anchor=pack_options[2]
+            side=pack_options[0],
+            anchor=pack_options[1]
         )
+
+    def listbox_input (tk_element, list_options=[], pack_options=()):
+        list_box = tk.Listbox(
+            tk_element,
+            background=bg_color,
+            foreground=fg_color,
+            font=("Arial Black", 12),
+            border=0,
+        )
+
+        index_options = 0
+        for option in list_options:
+            list_box.insert(index_options, option)
+            index_options += 1
+
+        list_box.pack(
+            padx=20,
+            pady=5,
+            expand=1,
+            fill=pack_options[0],
+            side=pack_options[1]
+        )
+
+        return list_box
 
 class tkinter_canvas ():
     """ Tkinter hangman-canvas class, contains the creator of the canvas and draw the initial progress of the "hang" """
@@ -288,6 +310,27 @@ class tkinter_popup ():
         )
         self.popup.wm_title(title)
 
-        title_label = text_creator.title(self.popup, ("x", "top"), title)
-        text_label = text_creator.text(self.popup, ("both", "top"), content)
-        popup_btn = inputs_creator.btn_input(self.popup, funct, "Next", "top")
+        text_creator.title(self.popup, ("x", "top"), title)
+        text_creator.text(self.popup, ("both", "top"), content)
+        inputs_creator.btn_input(self.popup, funct, "Next", "top")
+
+    def base_pop (self, title):
+        popup = tk.Toplevel(
+            background=bg_color,
+            padx=30,
+            pady=30
+        )
+        popup.wm_title(title)
+
+        screen_width = popup.winfo_screenwidth()
+        screen_height = popup.winfo_screenheight()
+
+        # Calc the size of the popup. 5/8 of the user screen on with and height
+        popup_width = int(screen_width * 0.625)
+        popup_height = int(screen_height * 0.625)
+        popup_x_cord = int((screen_width - popup_width) / 2)
+        popup_y_cord = int((screen_height - (popup_height + 20)) / 2) # + 20, of the window title and close, min window, fullscreen btns
+
+        popup.geometry(f"{popup_width}x{popup_height}+{popup_x_cord}+{popup_y_cord}")
+
+        return popup

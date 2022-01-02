@@ -1,9 +1,9 @@
 # Made By Bl4ky113
 
-from math import isnan
 import tkinter as tk
 import json
 from random import randrange
+from os import listdir
 from tk_classes import tkinter_canvas, tkinter_popup, tkinter_text, tkinter_wrapper, tkinter_input
 
 # Tkinter items creators.
@@ -21,7 +21,10 @@ def nextRound (popup):
     popup.destroy()
 
     if len(word_data["passed"]) == len(word_data["list"]):
-        print("End Of The Game")
+        popup_creator.pop(
+            lambda: changeWordListMenu(popup_creator.popup), 
+            "You have finished this list.", "Now you can choose another list and keep playing"
+        )
     else:
         word_data["guessed_letters"] = []
         word_data["to_guess"] = chooseWordToGuess(word_data["list"], word_data["passed"])
@@ -32,6 +35,70 @@ def nextRound (popup):
         word_label.configure(text=word_data["word_output"])
         game_status = True
 
+def getListOfWordList ():
+    """ Gets a list of the Word Lists available in the game files """
+    main_list = []
+
+    list_languages = listdir("./files")
+    for language in list_languages:
+        list_files = listdir(f"./files/{language}")
+        for file in list_files:
+            if (file[-5:] == ".json"):
+                file_name = f"{language}_{file.replace('.json', '')}"
+
+                main_list.append(file_name)
+
+    return main_list
+
+def changeWordListMenu (popup_caller=any):
+    """ Creates a Popup Where the user can select a list of words from the game files or from their files """
+
+    # Deletes the popup who called this function
+    try:
+        popup_caller.destroy()
+    except:
+        pass
+
+    # List of Word Lists available
+    list_wordlist = getListOfWordList()
+
+    # Creates the Base of the change Word List menu
+    popup_base = popup_creator.base_pop("Change The Word List")
+
+    # Header 
+    header_wrapper = tkinter_wrapper(popup_base, (0, "x", "top"))
+    text_creator.title(header_wrapper, ("x", "top"), "Change The Word List")
+
+    bl4ky_wrapper = tkinter_wrapper(popup_base, (0, "x", "top"))
+    text_creator.bl4ky(bl4ky_wrapper, ("x", "top"))
+
+    # Main
+    body_wrapper = tkinter_wrapper(popup_base, (1, "both", "top"))
+
+    boxlist = tkinter_input.listbox_input(body_wrapper, list_wordlist, ("both", "top"))
+
+    # Footer 
+    footer_wrapper = tkinter_wrapper(popup_base, (0, "x", "bottom"))
+    inputs_creator.btn_input(
+        footer_wrapper, 
+        lambda: changeWordList(boxlist.get(boxlist.curselection()[0]), popup_base),
+        "Change To the new List", 
+        "right"
+    )
+    # inputs_creator.btn_input(footer_wrapper, lambda: print("change"), "Open Word List", "right")
+
+def changeWordList (selected_file, popup):
+    """ Updates the global word list and passed words with the chosen word list and empty or new arr. 
+    Then starts a new round 
+    """
+    file_language = selected_file[:2]
+    file_name = selected_file[3:]
+
+    global word_data
+    word_data["list"] = getWordList(file_name, file_language)
+    word_data["passed"] = []
+
+    nextRound(popup)
 
 def getWordList (list_name="simple_words", language="en"):
     """ Gets the list of words in a json file """
@@ -93,14 +160,22 @@ def checkInput (input_word):
 
             if word_data["word_output"] == word_data["to_guess"]:
                 game_status = False
-                popup_creator.pop(lambda: nextRound(popup_creator.popup), "You Win This Round", "You have won this round. Congrats, you have saved him!!!")
+                popup_creator.pop(
+                    lambda: nextRound(popup_creator.popup), 
+                    "You Win This Round", 
+                    "You have won this round. Congrats, you have saved him!!!"
+                )
         else:
             hangman.current_step += 1
             hangProcess(hangman.current_step)
 
             if hangman.current_step >= 4:
                 game_status = False
-                popup_creator.pop(lambda: nextRound(popup_creator.popup), "You Lose This Round", "You have lost this round. You have killed him, monster.")
+                popup_creator.pop(
+                    lambda: nextRound(popup_creator.popup), 
+                    "You Lose This Round", 
+                    "You have lost this round. You have killed him, monster."
+                )
 
         input_word.set(input_letter)
     
@@ -190,13 +265,13 @@ def main ():
     entry_variable.trace_add("write", lambda x, y, z: checkInput(entry_variable))
 
     input_wrapper = tkinter_wrapper(base_tk, (1, "x", "top"))
-    inputs_creator.txt_input(input_wrapper, entry_variable, ("both", "top", "center"))
+    inputs_creator.txt_input(input_wrapper, entry_variable, ("top", "center"))
 
     # Footer
     footer_wrapper = tkinter_wrapper(base_tk, (0, "x", "bottom"))
     inputs_creator.btn_input(footer_wrapper, lambda: print("hello"), "Skip Word", "top")
-    inputs_creator.btn_input(footer_wrapper, lambda: print("hello"), "Change Word List", "right")
-    inputs_creator.btn_input(footer_wrapper, lambda: print("hello"), "Create Word List", "right")
+    inputs_creator.btn_input(footer_wrapper, changeWordListMenu, "Change Word List", "right")
+    # inputs_creator.btn_input(footer_wrapper, lambda: print("hello"), "Create Word List", "right")
 
     base_tk.mainloop()
 
