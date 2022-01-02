@@ -27,7 +27,8 @@ def nextRound (popup):
         game_data["status"] = False
         popup_creator.pop(
             lambda: changeWordListMenu(popup_creator.popup), 
-            "You have finished this list.", f"Now you can choose another list and keep playing. \nYour Total Score is: {game_data['score']}"
+            "You have finished this list.", 
+            f"Now you can choose another list and keep playing. \nYour Total Score is: {game_data['score']}"
         )
     else:
         word_data["guessed_letters"] = []
@@ -36,7 +37,14 @@ def nextRound (popup):
 
         hangProcess(step="all", delete_step=True)
         hangman.current_step = 0
-        word_label.configure(text=word_data["word_output"])
+        word_label.configure(
+            text=word_data["word_output"], 
+            font=(
+                "Arial Black", 
+                calcFontSize(len(word_data["word_output"])), 
+                "underline"
+            )
+        )
         score_label.configure(text=game_data["score"])
         game_data["status"] = True
 
@@ -102,7 +110,11 @@ def changeWordList (boxlist, popup):
         file_language = selected_file[:2]
         file_name = selected_file[3:]
     except:
-        popup_creator.pop(lambda: popup_creator.popup.destroy(), "Error On Loading Word List", "Please Enter a Valid Word List")
+        popup_creator.pop(
+            lambda: popup_creator.popup.destroy(), 
+            "Error On Loading Word List", 
+            "Please Enter a Valid Word List"
+        )
         return
 
     global word_data, game_data
@@ -168,7 +180,14 @@ def checkInput (input_word):
         if input_letter.lower() in word_data["to_guess"] and input_letter.lower() not in word_data["guessed_letters"]:
             word_data["guessed_letters"].append(input_letter.lower())
             word_data["word_output"] = transformWordToOutput(word_data["to_guess"], word_data["guessed_letters"])
-            word_label.configure(text=word_data["word_output"])
+            word_label.configure(
+                text=word_data["word_output"],
+                font=(
+                    "Arial Black", 
+                    calcFontSize(len(word_data["word_output"])), 
+                    "underline"
+                )
+            )
 
             # Calc the amount of score to add, for each letter of a word
             # If the word is more long than 10 chars large, it gives more points
@@ -217,6 +236,17 @@ def skipWord ():
             "You Have Skiped This Word",
             "Atleast you tried, right?"
         )
+
+def calcFontSize (len_word):
+    """ Calculates the size of the font depending the size of the word """
+    font_size = 48
+
+    font_size -= int(len_word / 4) * 3
+
+    if font_size < 12:
+        font_size = 12
+
+    return font_size
 
 def hangProcess (step=0, delete_step=False):
     """ Controls the progress of the hang process. Can Draw or delete each step """
@@ -276,18 +306,15 @@ def main ():
     content_wrapper = tkinter_wrapper(main_wrapper, (1, "both", "top"))
 
     # Word To Guess
-    wrap_len = int(base_width * 0.6) # Calc the wrap size of the letters in the wrapper.
-
-    font_size = 40 # Calc the size of the font in the word to guess
-    if len(word_data["to_guess"]) > 10:
-        font_size = 30
-    elif len(word_data["to_guess"]) > 15:
-        font_size = 25
-    elif len(word_data["to_guess"]) > 20:
-        font_size = 20
-
+    wrap_len = int(base_width * 0.5) # Calc the wrap size of the letters in the wrapper.
     word_wrapper = tkinter_wrapper(content_wrapper, (1, "both", "left"))
-    word_label = text_creator.word_to_guess(word_wrapper, ("x", "left"), word_data["output"], font_size, wrap_len)
+    word_label = text_creator.word_to_guess(
+        word_wrapper,
+        ("x", "left"),
+        word_data["output"],
+        calcFontSize(len(word_data["output"])),
+        wrap_len
+    )
     
     score_wrapper = tkinter_wrapper(content_wrapper, (0, "x", "bottom"))
     score_label = text_creator.score(score_wrapper, game_data["score"], ("x", "top"))
