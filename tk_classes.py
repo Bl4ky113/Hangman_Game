@@ -6,6 +6,16 @@ from tkinter import ttk
 bg_color = "#333333"
 fg_color = "#e9e9e9"
 
+def colorChanger (base_color, added_color, mode="+"):
+    """ Takes a hexadecimal color and adds other hexadecimal color. Returning the result as a string """  
+    operator = 1
+    if mode == "-":
+        operator = -1
+
+    new_color = f"#{hex(int(base_color[1:], 16) + (int(added_color, 16) * operator))[2:]}"
+
+    return new_color
+
 def tkinter_wrapper (tk_element, pack_options=()):
     """ Creates a Frame wrapper and return the wrapper item """
     wrapper = tk.Frame(
@@ -24,7 +34,7 @@ class tkinter_text ():
     """ Styled tkinter text creator """
     def title (self, tk_element, pack_options=(), content=""):
         """ Creates a title styled text """
-        title_bg_color = f"#{int(bg_color[1:]) + 111111}"
+        title_bg_color = colorChanger(bg_color, "111111")
 
         title_element = ttk.Label(
             tk_element,
@@ -61,7 +71,7 @@ class tkinter_text ():
 
     def word_to_guess (self, tk_element, pack_options=(), content="", font_size=20, wrap_len=0):
         """ Creates a styled text for the letters or word (not certain) of the word to guess. """
-        word_bg_color = f"#{hex(int(bg_color[1:], 16) + int('151515', 16))[2:]}"
+        word_bg_color = colorChanger(bg_color, "151515")
         
         text_element = ttk.Label(
             tk_element,
@@ -84,14 +94,14 @@ class tkinter_text ():
 
     def score (self, tk_element, content, pack_option=()):
         """ Creates a styled text for the score of the game """
-        score_bg_color = f"#{hex(int(bg_color[1:], 16) - int('1a1a1a', 16))[2:]}"
+        score_bg_color = colorChanger(bg_color, '111111', mode="-")
 
         score_element = ttk.Label(
             tk_element,
             padding=(10, 2),
             font=("consolas", 14, "underline"),
             foreground=fg_color,
-            background=bg_color,
+            background=score_bg_color,
             text=content
         )
         score_element.pack(
@@ -123,8 +133,8 @@ class tkinter_input ():
     """ Styled tkinter input creator """
     def btn_input (self, tk_element, onclick, content="", pack_options=""):
         """ Creates a Styled tkinter btn """
-        input_color = f"#{int(bg_color[1:]) + 111111}"
-        active_input_color = f"#{int(bg_color[1:]) + 222222}"
+        input_color = colorChanger(bg_color, "111111")
+        active_input_color = colorChanger(bg_color, "222222")
 
         btn = tk.Button(
             tk_element,
@@ -145,7 +155,7 @@ class tkinter_input ():
 
     def txt_input (self, tk_element, output_variable, pack_options=()):
         """ Creates a Styled Tkinter text input """
-        input_color = f"#{int(bg_color[1:]) - 111111}"
+        input_color = colorChanger(bg_color, "111111", mode="-")
 
         text_input = tk.Entry(
             tk_element,
@@ -293,7 +303,7 @@ class tkinter_canvas ():
 
     def drawStep4 (self):
         """ Draws the rope around the man's neck and hangs him also writes on screen "hanged". (4/4) """
-        rope_color = f"#{hex(int(bg_color[1:], 16) + int('555555', 16))[2:]}"
+        rope_color = colorChanger(bg_color, '555555')
 
         self.canvas.create_polygon(
             (self.cw * 0.52), (self.ch * 0.44),
