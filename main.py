@@ -24,6 +24,7 @@ def nextRound (popup):
     popup.destroy()
 
     if len(word_data["passed"]) == len(word_data["list"]):
+        game_data["status"] = False
         popup_creator.pop(
             lambda: changeWordListMenu(popup_creator.popup), 
             "You have finished this list.", f"Now you can choose another list and keep playing. \nYour Total Score is: {game_data['score']}"
@@ -208,13 +209,14 @@ def checkInput (input_word):
 def skipWord ():
     global game_data
 
-    game_data["score"] -= int(30 * (10 / len(word_data["to_guess"])))
+    if game_data["status"]:
+        game_data["score"] -= int(30 * (10 / len(word_data["to_guess"])))
 
-    popup_creator.pop(
-        lambda: nextRound(popup_creator.popup),
-        "You Have Skiped This Word",
-        "Atleast you tried, right?"
-    )
+        popup_creator.pop(
+            lambda: nextRound(popup_creator.popup),
+            "You Have Skiped This Word",
+            "Atleast you tried, right?"
+        )
 
 def hangProcess (step=0, delete_step=False):
     """ Controls the progress of the hang process. Can Draw or delete each step """
