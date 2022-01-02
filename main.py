@@ -11,19 +11,22 @@ text_creator = tkinter_text()
 inputs_creator = tkinter_input()
 popup_creator = tkinter_popup()
 
-global game_status
-game_status = True
+global game_data
+game_data = {
+    "status": True,
+    "score": 0
+}
 
 def nextRound (popup):
     """ Swaps to the next round, changing the word to guess and restarting the round. Gets called from a Popup """
-    global game_status, word_data
+    global game_data, word_data
 
     popup.destroy()
 
     if len(word_data["passed"]) == len(word_data["list"]):
         popup_creator.pop(
             lambda: changeWordListMenu(popup_creator.popup), 
-            "You have finished this list.", "Now you can choose another list and keep playing"
+            "You have finished this list.", f"Now you can choose another list and keep playing. \nYour Total Score is: {game_data['score']}"
         )
     else:
         word_data["guessed_letters"] = []
@@ -33,7 +36,8 @@ def nextRound (popup):
         hangProcess(step="all", delete_step=True)
         hangman.current_step = 0
         word_label.configure(text=word_data["word_output"])
-        game_status = True
+        score_label.configure(text=game_data["score"])
+        game_data["status"] = True
 
 def getListOfWordList ():
     """ Gets a list of the Word Lists available in the game files """
@@ -89,14 +93,15 @@ def changeWordListMenu (popup_caller=any):
 
 def changeWordList (selected_file, popup):
     """ Updates the global word list and passed words with the chosen word list and empty or new arr. 
-    Then starts a new round 
+    Restarts the score and then starts a new round 
     """
     file_language = selected_file[:2]
     file_name = selected_file[3:]
 
-    global word_data
+    global word_data, game_data
     word_data["list"] = getWordList(file_name, file_language)
     word_data["passed"] = []
+    game_data["score"] = 0
 
     nextRound(popup)
 
@@ -148,18 +153,24 @@ def checkInput (input_word):
         If its right shows the letter in the outputWord, if the output word and word to guess are the same. Win the round.
         If it isn't right moves 1 step the hangman progress. If the hangman gets hang, lose the round.
     """
-    global game_status
+    global game_data
 
-    if len(input_word.get()) > 0 and game_status:
+    if len(input_word.get()) > 0 and game_data["status"]:
         input_letter = input_word.get()[-1]
 
-        if input_letter.lower() in word_data["to_guess"]:
+        if input_letter.lower() in word_data["to_guess"] and input_letter.lower() not in word_data["guessed_letters"]:
             word_data["guessed_letters"].append(input_letter.lower())
             word_data["word_output"] = transformWordToOutput(word_data["to_guess"], word_data["guessed_letters"])
             word_label.configure(text=word_data["word_output"])
 
+            # Calc the amount of score to add, for each letter of a word
+            # If the word is more long than 10 chars large, it gives more points
+            # If the word is smaller than 10 chars, it gives fewer points
+            game_data["score"] += int(25 * (len(word_data["to_guess"]) / 10))
+            score_label.configure(text=game_data["score"])
+
             if word_data["word_output"] == word_data["to_guess"]:
-                game_status = False
+                game_data["status"] = False
                 popup_creator.pop(
                     lambda: nextRound(popup_creator.popup), 
                     "You Win This Round", 
@@ -169,8 +180,14 @@ def checkInput (input_word):
             hangman.current_step += 1
             hangProcess(hangman.current_step)
 
+            # Calc the amount of score to subtract, for each letter of a word
+            # If the word is more long than 10 chars, it takes fewer points
+            # If the word is smaller than 10 chars, it takes more points
+            game_data["score"] -= int(12 * (10 / len(word_data["to_guess"])))
+            score_label.configure(text=game_data["score"])
+
             if hangman.current_step >= 4:
-                game_status = False
+                game_data["status"] = False
                 popup_creator.pop(
                     lambda: nextRound(popup_creator.popup), 
                     "You Lose This Round", 
@@ -181,6 +198,17 @@ def checkInput (input_word):
     
     else: 
         input_word.set("")
+
+def skipWord ():
+    global game_data
+
+    game_data["score"] -= int(30 * (10 / len(word_data["to_guess"])))
+
+    popup_creator.pop(
+        lambda: nextRound(popup_creator.popup),
+        "You Have Skiped This Word",
+        "Atleast you tried, right?"
+    )
 
 def hangProcess (step=0, delete_step=False):
     """ Controls the progress of the hang process. Can Draw or delete each step """
@@ -197,7 +225,7 @@ def main ():
     """ Main Function """
 
     # Get the Initial Word data 
-    global word_data, hangman, word_label
+    global word_data, hangman, word_label, score_label
     word_data = {
         "list": getWordList(),
         "passed": [],
@@ -252,11 +280,14 @@ def main ():
 
     word_wrapper = tkinter_wrapper(content_wrapper, (1, "both", "left"))
     word_label = text_creator.word_to_guess(word_wrapper, ("x", "left"), word_data["output"], font_size, wrap_len)
+    
+    score_wrapper = tkinter_wrapper(content_wrapper, (0, "x", "bottom"))
+    score_label = text_creator.score(score_wrapper, game_data["score"], ("x", "top"))
 
     # Hangman Icon
-    # Calc the size of the hangman canvas. 35% width and 50% height of the base_tk
+    # Calc the size of the hangman canvas. 35% width and 46% height of the base_tk
     canvas_width = int(base_width * 0.35)
-    canvas_height = int(base_height * 0.5)
+    canvas_height = int(base_height * 0.45)
 
     hangman = tkinter_canvas(content_wrapper, canvas_width, canvas_height, "right")
 
@@ -269,7 +300,7 @@ def main ():
 
     # Footer
     footer_wrapper = tkinter_wrapper(base_tk, (0, "x", "bottom"))
-    inputs_creator.btn_input(footer_wrapper, lambda: print("hello"), "Skip Word", "top")
+    inputs_creator.btn_input(footer_wrapper, skipWord, "Skip Word", "top")
     inputs_creator.btn_input(footer_wrapper, changeWordListMenu, "Change Word List", "right")
     # inputs_creator.btn_input(footer_wrapper, lambda: print("hello"), "Create Word List", "right")
 

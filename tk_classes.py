@@ -49,6 +49,8 @@ class tkinter_text ():
             font=("Arial Greek", 16),
             foreground=fg_color,
             background=bg_color,
+            anchor="center",
+            justify="center",
             text=content
         )
         text_element.pack(
@@ -80,11 +82,31 @@ class tkinter_text ():
 
         return text_element
 
+    def score (self, tk_element, content, pack_option=()):
+        """ Creates a styled text for the score of the game """
+        score_bg_color = f"#{hex(int(bg_color[1:], 16) - int('1a1a1a', 16))[2:]}"
+
+        score_element = ttk.Label(
+            tk_element,
+            padding=(10, 2),
+            font=("consolas", 14, "underline"),
+            foreground=fg_color,
+            background=bg_color,
+            text=content
+        )
+        score_element.pack(
+            expand=0,
+            fill=pack_option[0],
+            side=pack_option[1]
+        )
+
+        return score_element
+
     def bl4ky (self, tk_element, pack_options=()):
         """ Creates a styled text with my personal-"artist" signature """
         text_element = ttk.Label(
             tk_element,
-            padding=(10, 5),
+            padding=(10, 2),
             font=("Consolas", 12),
             foreground=fg_color,
             background=bg_color,
