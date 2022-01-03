@@ -2,7 +2,7 @@
 
 ## Game's Description
 
-Hangman is a simple game were you have to guess a word b guessing the letters in it. 
+Hangman is a simple game were you have to guess a word by guessing the letters in it. 
 
 If you guess one of the letters in the word, they will be shown on the word. Providing clues for guessing the word.
 
