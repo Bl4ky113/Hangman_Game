@@ -54,13 +54,16 @@ def getListOfWordList ():
     main_list = []
 
     list_languages = listdir("./files")
-    for language in list_languages:
-        list_files = listdir(f"./files/{language}")
-        for file in list_files:
-            if (file[-5:] == ".json"):
-                file_name = f"{language}_{file.replace('.json', '')}"
+    try:
+        for language in list_languages:
+            list_files = listdir(f"./files/{language}")
+            for file in list_files:
+                if (file[-5:] == ".json"):
+                    file_name = f"{language}_{file.replace('.json', '')}"
 
-                main_list.append(file_name)
+                    main_list.append(file_name)
+    except:
+        pass
 
     return main_list
 
@@ -247,7 +250,7 @@ def getWordList (list_name="simple_words", language="en", local_wordlists=True):
         list_dict = json.load(list_file)
         
         for word in list_dict["words"]:
-            words_arr.append(word.lower())
+            words_arr.append(word.lower().strip())
 
     return words_arr
 
@@ -314,7 +317,7 @@ def checkInput (input_word):
                 popup_creator.pop(
                     lambda: nextRound(popup_creator.popup), 
                     "You Win This Round", 
-                    f"You have won this round. Congrats, you have saved him!!! \nThis round word was: {word_data['to_guess']}"
+                    f"You have won this round. Congrats, you have saved him!!! \nThis round word was: '{word_data['to_guess']}'"
                 )
         else:
             hangman.current_step += 1
@@ -331,7 +334,7 @@ def checkInput (input_word):
                 popup_creator.pop(
                     lambda: nextRound(popup_creator.popup), 
                     "You Lose This Round", 
-                    f"You have lost this round. You have killed him, monster. \nThis round word was: {word_data['to_guess']}"
+                    f"You have lost this round. You have killed him, monster. \nThis round word was: '{word_data['to_guess']}'"
                 )
 
         input_word.set(input_letter)
