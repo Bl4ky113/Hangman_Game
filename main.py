@@ -4,6 +4,7 @@ import tkinter as tk
 import json
 from random import randrange
 from os import listdir
+from tkinter.filedialog import askopenfile, asksaveasfilename
 from tk_classes import tkinter_canvas, tkinter_popup, tkinter_text, tkinter_wrapper, tkinter_input
 
 # Tkinter items creators.
@@ -33,15 +34,15 @@ def nextRound (popup):
     else:
         word_data["guessed_letters"] = []
         word_data["to_guess"] = chooseWordToGuess(word_data["list"], word_data["passed"])
-        word_data["word_output"] = transformWordToOutput(word_data["to_guess"], word_data["guessed_letters"])
+        word_data["output"] = transformWordToOutput(word_data["to_guess"], word_data["guessed_letters"])
 
         hangProcess(step="all", delete_step=True)
         hangman.current_step = 0
         word_label.configure(
-            text=word_data["word_output"], 
+            text=word_data["output"], 
             font=(
                 "Arial Black", 
-                calcFontSize(len(word_data["word_output"])), 
+                calcFontSize(len(word_data["output"])), 
                 "underline"
             )
         )
@@ -62,6 +63,95 @@ def getListOfWordList ():
                 main_list.append(file_name)
 
     return main_list
+
+def createWordListMenu ():
+    """ Creates a Popup where the use can create and make a word list """
+
+    # Creates the Base of the create Word List menu
+    popup_base = popup_creator.base_pop("Create a Word List")
+
+    # Header
+    header_wrapper = tkinter_wrapper(popup_base, (0, "x", "top"))
+    text_creator.title(header_wrapper, ("x", "top"), "Create a Word List")
+
+    bl4ky_wrapper = tkinter_wrapper(popup_base, (0, "x", "top"))
+    text_creator.bl4ky(bl4ky_wrapper, ("x", "top"))
+
+    # Main
+    main_wrapper = tkinter_wrapper(popup_base, (1, "both", "top"))
+    textbox = tkinter_input.textbox_input(main_wrapper, (1, "both", "top"))
+
+    # Footer
+    footer_wrapper = tkinter_wrapper(popup_base, (0, "x", "bottom"))
+    inputs_creator.btn_input(
+        footer_wrapper, 
+        lambda: popup_creator.pop(
+            lambda: popup_creator.popup.destroy(),
+            "How To Write a WordList",
+            """To Write a WordList in this menu, you only have to write the words 
+            what you want in your list in the text input and separate each word with an 'Enter'. \nWe recomend 
+            not using non UTF-8 characters and making 8 - 10 word long WordLists"""
+        ),
+        "Help", 
+        "left"
+    )
+    inputs_creator.btn_input(
+        footer_wrapper, 
+        lambda: saveCreatedWordList(textbox.get(1.0, "end-1c").split("\n"), popup_base),
+        "Save WordList", 
+        "right"
+    )
+
+def checkWordList (wordlist=[]):
+    """ Checks if the WordList is right and usable """
+    if len(wordlist) > 0:
+        for word in wordlist:
+            if not isinstance(word, str):
+                return False
+    else:
+        return False
+
+    return True
+
+def saveCreatedWordList (textbox_input=[], popup_caller=any):
+    if checkWordList(textbox_input):
+        wordlist_obj = { "words": textbox_input }
+
+        saved_file = asksaveasfilename( 
+            defaultextension=".json",
+            initialdir="./files",
+            title="Save WordList",
+            filetypes=(
+                ("JSON Files", "*.json"),
+                ("All Files", "*.*")
+            )
+        )
+
+        if saved_file:
+            with open(saved_file, "w") as open_file:
+                json.dump(wordlist_obj, open_file)
+
+            popup_caller.destroy()
+
+            popup_creator.pop(
+                lambda: popup_creator.popup.destroy(),
+                "Saved The WordList",
+                "Now you can open and play with your WordList, selecting it in the Change WordList Menu."
+            )
+
+        else:
+            popup_creator.pop(
+                lambda: popup_creator.popup.destroy(),
+                "Error While Saving The WordList",
+                "Please select the folder were you want to save the WordList, give the WordList a name, and press the save button."
+            )
+
+    else:
+        popup_creator.pop(
+            lambda: popup_creator.popup.destroy(),
+            "Error On Saving The WordList",
+            "Please Make sure that you made the WordList following the guide in the help menu."
+        )
 
 def changeWordListMenu (popup_caller=any):
     """ Creates a Popup Where the user can select a list of words from the game files or from their files """
@@ -98,35 +188,59 @@ def changeWordListMenu (popup_caller=any):
         "Change To the new List", 
         "right"
     )
+    inputs_creator.btn_input(
+        footer_wrapper, 
+        lambda: changeWordList(
+            askopenfile(
+                initialdir="./files",
+                title="Open WordList",
+                filetypes=(
+                    ("JSON Files", "*.json"),
+                    ("All Files", "*.*")
+                )
+            ).name,
+            popup_base,
+            False
+        ), 
+        "Open Word List", 
+        "left"
+    )
 
-    # inputs_creator.btn_input(footer_wrapper, lambda: print("change"), "Open Word List", "right")
-
-def changeWordList (boxlist, popup):
+def changeWordList (wordlist_name, popup_caller, local_wordlist=True):
     """ Updates the global word list and passed words with the chosen word list and empty or new arr. 
-    Restarts the score and then starts a new round 
+    Restarts the score and then starts a new round
     """
-    try:
-        selected_file = boxlist.get(boxlist.curselection()[0])
-        file_language = selected_file[:2]
-        file_name = selected_file[3:]
-    except:
-        popup_creator.pop(
-            lambda: popup_creator.popup.destroy(), 
-            "Error On Loading Word List", 
-            "Please Enter a Valid Word List"
-        )
-        return
-
     global word_data, game_data
-    word_data["list"] = getWordList(file_name, file_language)
+
+    if local_wordlist:
+        try:
+            selected_file = wordlist_name.get(wordlist_name.curselection()[0])
+            file_language = selected_file[:2]
+            file_name = selected_file[3:]
+            word_data["list"] = getWordList(file_name, file_language)
+        except:
+            popup_creator.pop(
+                lambda: popup_creator.popup.destroy(), 
+                "Error On Loading Word List", 
+                "Please Enter a Valid Word List"
+            )
+            return
+
+    else: 
+        word_data["list"] = getWordList(wordlist_name, any, False)
+
     word_data["passed"] = []
     game_data["score"] = 0
 
-    nextRound(popup)
+    nextRound(popup_caller)
 
-def getWordList (list_name="simple_words", language="en"):
+def getWordList (list_name="simple_words", language="en", local_wordlists=True):
     """ Gets the list of words in a json file """
-    list_url = f"./files/{language}/{list_name}.json"
+    list_url = f"./files/{language}/{list_name}.json" # Local WordLists
+
+    if not local_wordlists:
+        list_url = list_name # External WordLists
+
     words_arr = []
 
     with open(list_url, "r", encoding="UTF-8") as list_file:
@@ -179,12 +293,12 @@ def checkInput (input_word):
 
         if input_letter.lower() in word_data["to_guess"] and input_letter.lower() not in word_data["guessed_letters"]:
             word_data["guessed_letters"].append(input_letter.lower())
-            word_data["word_output"] = transformWordToOutput(word_data["to_guess"], word_data["guessed_letters"])
+            word_data["output"] = transformWordToOutput(word_data["to_guess"], word_data["guessed_letters"])
             word_label.configure(
-                text=word_data["word_output"],
+                text=word_data["output"],
                 font=(
                     "Arial Black", 
-                    calcFontSize(len(word_data["word_output"])), 
+                    calcFontSize(len(word_data["output"])), 
                     "underline"
                 )
             )
@@ -195,12 +309,12 @@ def checkInput (input_word):
             game_data["score"] += int(25 * (len(word_data["to_guess"]) / 10))
             score_label.configure(text=game_data["score"])
 
-            if word_data["word_output"] == word_data["to_guess"]:
+            if word_data["output"] == word_data["to_guess"]:
                 game_data["status"] = False
                 popup_creator.pop(
                     lambda: nextRound(popup_creator.popup), 
                     "You Win This Round", 
-                    "You have won this round. Congrats, you have saved him!!!"
+                    f"You have won this round. Congrats, you have saved him!!! \nThis round word was: {word_data['to_guess']}"
                 )
         else:
             hangman.current_step += 1
@@ -217,7 +331,7 @@ def checkInput (input_word):
                 popup_creator.pop(
                     lambda: nextRound(popup_creator.popup), 
                     "You Lose This Round", 
-                    "You have lost this round. You have killed him, monster."
+                    f"You have lost this round. You have killed him, monster. \nThis round word was: {word_data['to_guess']}"
                 )
 
         input_word.set(input_letter)
@@ -226,6 +340,7 @@ def checkInput (input_word):
         input_word.set("")
 
 def skipWord ():
+    """ Skips the current word, and passes to the next round """
     global game_data
 
     if game_data["status"]:
@@ -316,6 +431,7 @@ def main ():
         wrap_len
     )
     
+    # Game Score
     score_wrapper = tkinter_wrapper(content_wrapper, (0, "x", "bottom"))
     score_label = text_creator.score(score_wrapper, game_data["score"], ("x", "top"))
 
@@ -337,7 +453,7 @@ def main ():
     footer_wrapper = tkinter_wrapper(base_tk, (0, "x", "bottom"))
     inputs_creator.btn_input(footer_wrapper, skipWord, "Skip Word", "top")
     inputs_creator.btn_input(footer_wrapper, changeWordListMenu, "Change Word List", "right")
-    # inputs_creator.btn_input(footer_wrapper, lambda: print("hello"), "Create Word List", "right")
+    inputs_creator.btn_input(footer_wrapper, createWordListMenu, "Create Word List", "right")
 
     base_tk.mainloop()
 

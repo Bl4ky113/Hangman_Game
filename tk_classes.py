@@ -202,6 +202,33 @@ class tkinter_input ():
 
         return list_box
 
+    def textbox_input (tk_element, pack_options=()):
+        """ Creates a Styled Tkinter text input """
+        parent_height = tk_element.winfo_height()
+        textbox_height = int(parent_height * 0.5) # element height is the 50% of the parent window (popup or tk_base)
+
+        textbox = tk.Text(
+            tk_element,
+            background=bg_color,
+            foreground=fg_color,
+            font=("Arial Black", 16),
+            blockcursor=True,
+            border=2,
+            relief="solid",
+            height=textbox_height
+        )
+        textbox.pack(
+            padx=20,
+            pady=5,
+            ipadx=10,
+            ipady=10,
+            expand=pack_options[0],
+            fill=pack_options[1],
+            side=pack_options[2]
+        )
+
+        return textbox
+
 class tkinter_canvas ():
     """ Tkinter hangman-canvas class, contains the creator of the canvas and draw the initial progress of the "hang" """
     def __init__ (self, tk_element, width, height, pack_option):
